@@ -399,11 +399,23 @@ private:
   //       parameter to compare elements.
   //       Two elements A and B are equivalent if and only if A is
   //       not less than B and B is not less than A.
+
+  //I DONT THINK THIS IS TAIL RECURSIVE
   static Node * find_impl(Node *node, const T &query, Compare less) {
     if(!node){
       return nullptr;
     }
-    else if(node->datum)
+    else if(!(less(node->datum, query) && !less(query, node->datum))){
+      //this seems wrong
+      Node *find = &node;
+      return find;
+    }
+    else if(less(query,node->datum)){
+      find_impl(node->left, query, less);
+    }
+    else{
+      find_impl(node->right, query, less);
+    }
   }
 
   // REQUIRES: item is not already contained in the tree rooted at 'node'
@@ -422,7 +434,18 @@ private:
   //       template, NOT according to the < operator. Use the "less"
   //       parameter to compare elements.
   static Node * insert_impl(Node *node, const T &item, Compare less) {
-    assert(false);
+    if(!node){
+      //idk if this is right
+      Node *new_node = new Node(item, nullptr, nullptr);
+      return new_node;
+    }
+    if(less(node->datum, item)){
+      node->right = insert_impl(node->right, item, less);
+    }
+    else if(less(item, node->datum)){
+      node->left = insert_impl(node->left, item, less);
+    }
+    return node;
   }
 
   // EFFECTS : Returns a pointer to the Node containing the minimum element
@@ -432,8 +455,15 @@ private:
   //       the iterator code that is provided for you.
   // HINT: You don't need to compare any elements! Think about the
   //       structure, and where the smallest element lives.
+
+  //this is also probs wrong
   static Node * min_element_impl(Node *node) {
-    assert(false);
+    if (!node->left) {                // base case
+      return node->datum;
+    } 
+    else {                           // recursive case
+      return min_element_impl(node->left);
+    }
   }
 
   // EFFECTS : Returns a pointer to the Node containing the maximum element
@@ -442,7 +472,12 @@ private:
   // HINT: You don't need to compare any elements! Think about the
   //       structure, and where the largest element lives.
   static Node * max_element_impl(Node *node) {
-    assert(false);
+    if (!node->right) {                // base case
+      return node->datum;
+    } 
+    else {                           // recursive case
+      return max_element_impl(node->right);
+    }
   }
 
 
