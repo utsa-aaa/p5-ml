@@ -32,9 +32,19 @@ private:
 
   // A custom comparator
   class PairComp {
+  private:
+    Key_compare comp;
+
+  public:
+    //default
+    PairComp(){}
+    //non default
+    PairComp(const Key_compare& comparator)
+    :comp(comparator){}
+
 
     bool operator()(const Pair_type &left, const Pair_type &right) const {
-      return Key_compare(left.first, right.first);
+      return comp(left.first, right.first);
     }
 
   };
@@ -63,6 +73,18 @@ public:
   // If these operations will work correctly without defining them,
   // you should omit them. A user of the class must be able to create,
   // copy, assign, and destroy Maps.
+  Map ()
+  : BST(BinarySearchTree()){}
+
+  Map (const Map &other)
+  : BST(other.BST) {}
+
+  Map &operator=(const Map &rhs) {
+    if (this != rhs) {
+      BST = rhs.BST;
+    }
+    return *this;
+  }
 
 
   // EFFECTS : Returns whether this Map is empty.
@@ -73,7 +95,7 @@ public:
   // EFFECTS : Returns the number of elements in this Map.
   // NOTE : size_t is an integral type from the STL
   size_t size() const{
-    return BST.size()
+    return BST.size();
   }
 
 
@@ -85,7 +107,8 @@ public:
   //       (key, value) pairs, you'll need to construct a dummy value
   //       using "Value_type()".
   Iterator find(const Key_type& k) const{
-    return BST.find(k);
+    Pair_type dummy_val(k, Value_type());
+    return BST.find(dummy_val);
   }
 
   // MODIFIES: this
@@ -117,13 +140,13 @@ public:
   //           an iterator to the newly inserted element, along with
   //           the value true.
   std::pair<Iterator, bool> insert(const Pair_type &val){
-    Iterator it = find(const Key_type& val.second);
+    Iterator it = find(val.first);
     if (it == end()){
       Iterator inserted = BST.insert(val);
-      return std::pair<inserted, true>;
+      return {inserted, true};
     }
     else{
-      return std::pair<it, false>;
+      return {it, false};
     }
 
     
