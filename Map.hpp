@@ -80,7 +80,7 @@ public:
   : BST(other.BST) {}
 
   Map &operator=(const Map &rhs) {
-    if (this != rhs) {
+    if (this != &rhs) {
       BST = rhs.BST;
     }
     return *this;
