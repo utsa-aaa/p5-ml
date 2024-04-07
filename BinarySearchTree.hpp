@@ -342,7 +342,7 @@ private:
       return 0;
     } 
     else {                                            // non-empty tree
-      return 1 + size(node->left) + size(node->right);
+      return 1 + size_impl(node->left) + size_impl(node->right);
     }
   }
 
@@ -355,8 +355,8 @@ private:
       return 0;
     } 
     else {                                            // non-empty tree
-      return 1 + std::max(height(node->left),
-      height(node->right));
+      return 1 + std::max(height_impl(node->left),
+      height_impl(node->right));
     }
   }
 
@@ -405,15 +405,15 @@ private:
     if(!node){
       return nullptr;
     }
-    else if(!(less(node->datum, query) && !less(query, node->datum))){
+    else if((!less(node->datum, query) && !less(query, node->datum))){
       //this seems wrong
-      return *node;
+      return node;
     }
     else if(less(query,node->datum)){
-      find_impl(node->left, query, less);
+      return find_impl(node->left, query, less);
     }
     else{
-      find_impl(node->right, query, less);
+      return find_impl(node->right, query, less);
     }
   }
 
@@ -461,7 +461,7 @@ private:
       return nullptr;
     }
     if (!node->left) {                // base case
-      return *node;
+      return node;
     } 
     else {                           // recursive case
       return min_element_impl(node->left);
@@ -478,7 +478,7 @@ private:
       return nullptr;
     }
     if (!node->right) {                // base case
-      return *node;
+      return node;
     } 
     else {                           // recursive case
       return max_element_impl(node->right);
@@ -495,15 +495,15 @@ private:
     }
 
     //if the right node is not nullptr and right node is less than current node
-    if(!node->right && less(node->right->datum, node->datum)){
+    if(node->right && less(node->right->datum, node->datum)){
       return false;
     }
 
     //if the left node is not nullptr and left node is greater than current node
-    if(!node->left && less(node->datum,node->left->datum)){
-        return false;
+    if(node->left && less(node->datum,node->left->datum)){
+      return false;
     }
-
+  return check_sorting_invariant_impl(node->right, less) && check_sorting_invariant_impl(node->left, less);
 
     
 
@@ -522,9 +522,9 @@ private:
     if(!node){
       return;
     }
-    traverse_inorder_impl(node->left);
-    os<<node->datum<<<" ";
-    traverse_inorder_impl(node->right);
+    traverse_inorder_impl(node->left, os);
+    os<<node->datum<<" ";
+    traverse_inorder_impl(node->right, os);
   }
 
   // EFFECTS : Traverses the tree rooted at 'node' using a pre-order traversal,
@@ -539,8 +539,8 @@ private:
       return;
     }
     os<<node->datum<<" ";
-    traverse_preorder_impl(node->left);
-    traverse_preorder_impl(node->right);
+    traverse_preorder_impl(node->left, os);
+    traverse_preorder_impl(node->right, os);
   }
 
   // EFFECTS : Returns a pointer to the Node containing the smallest element
@@ -554,15 +554,31 @@ private:
   // HINT: At each step, compare 'val' the the current node (using the
   //       'less' parameter). Based on the result, you gain some information
   //       about where the element you're looking for could be.
+
+  //I'll clean this up later
   static Node * min_greater_than_impl(Node *node, const T &val, Compare less) {
     if(!node){
       return nullptr;
     }
 
-    return min_greater_than_impl(node->right,)
+    //if the node is greater than and the left node is also greater than
+    if (node->left && (less(val, node->datum) && less(val, node->left->datum)) ){
+      return min_greater_than_impl(node->left, val, less);
+    }
+    //equal or less, theres probably a better way to do this
+    if (node->right && (less(node->datum, val) ||  (!less(val, node->datum)&&(!less(val, node->datum))))){
+      return min_greater_than_impl(node->right, val, less);
+    }
+    //node is either greater than or less than with no right node
+    if (less(val, node->datum)){
+      return node;
+    }
+    else{
+      return nullptr;
+    }
+
+
   }
-
-
 }; // END of BinarySearchTree class
 
 #include "TreePrint.hpp" // DO NOT REMOVE!!!

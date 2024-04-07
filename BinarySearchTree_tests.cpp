@@ -1,6 +1,8 @@
 #include "BinarySearchTree.hpp"
 #include "unit_test_framework.hpp"
+#include <sstream>
 
+using namespace std;
 
 TEST(test_default_ctor) {
     BinarySearchTree<int> BST;
@@ -46,7 +48,7 @@ TEST(test_non_default_ctor) {
     ASSERT_EQUAL(BST.find(20), it_end);
 
     auto it_beg = BST.begin();
-    ASSERT_EQUAL(BST.find(4), it_beg);
+    ASSERT_EQUAL(BST.find(1), it_beg);
 
     auto it_max = BST.max_element();
     ASSERT_EQUAL(*it_max, 7);
@@ -69,7 +71,6 @@ TEST(test_height) {
 
     auto it_max = BST.max_element();
     ASSERT_EQUAL(*it_max, 8);
-
     it_begin++;
     ASSERT_EQUAL(*it_begin, 2);
 
@@ -88,12 +89,12 @@ TEST(test_branch_and_copy) {
 
     BinarySearchTree<int> BST2;
     BST2 = BST;
-    auto it_max = BST2.max_element();
+    auto it_min = BST2.min_element();
     auto it_begin = BST2.begin();
 
-    ASSERT_EQUAL(it_max, it_begin);
+
+    ASSERT_EQUAL(it_min, it_begin);
     
-    auto it_min = BST2.min_element();
     ASSERT_EQUAL(*it_min, 3);
 
     ASSERT_EQUAL(BST2.height(), 5u);

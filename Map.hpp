@@ -74,7 +74,7 @@ public:
   // you should omit them. A user of the class must be able to create,
   // copy, assign, and destroy Maps.
   Map ()
-  : BST(BinarySearchTree()){}
+  : BST(BinarySearchTree<Pair_type, PairComp>()){}
 
   Map (const Map &other)
   : BST(other.BST) {}
