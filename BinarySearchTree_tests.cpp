@@ -258,18 +258,15 @@ TEST(test_min){
     BST.insert(4);
     BST.insert(5);
     BST.insert(7);
-    auto it_begin = BST.begin();
-    it_begin++;
-    ASSERT_EQUAL(BST.min_element(),it_begin);
+    ASSERT_EQUAL(*BST.min_element(),2);
     
     BinarySearchTree<int> BST2;
-    BST2.insert(1);
+    BST2.insert(6);
     BST2.insert(2);
     BST2.insert(3);
     BST2.insert(6);
-    BST2.insert(8);
-    auto it_begin2 = BST2.begin();
-    ASSERT_EQUAL(BST2.min_element(),it_begin2);
+    BST2.insert(1);
+    ASSERT_EQUAL(*BST2.min_element(),1);
 
     BinarySearchTree<int> BST3;
     auto it_end = BST3.end();
@@ -282,11 +279,7 @@ TEST(test_max){
     BST.insert(2);
     BST.insert(5);
     BST.insert(7);
-    auto it_begin = BST.begin();
-    it_begin++;
-    it_begin++;
-    it_begin++;
-    ASSERT_EQUAL(BST.max_element(),it_begin);
+    ASSERT_EQUAL(*BST.max_element(),7);
     
     BinarySearchTree<int> BST2;
     BST2.insert(7);
@@ -294,10 +287,7 @@ TEST(test_max){
     BST2.insert(9);
     BST2.insert(6);
     BST2.insert(8);
-    auto it_begin2 = BST2.begin();
-    it_begin2++;
-    it_begin2++;
-    ASSERT_EQUAL(BST2.max_element(),it_begin2);
+    ASSERT_EQUAL(*BST2.max_element(),9);
 
     BinarySearchTree<int> BST3;
     auto it_end = BST3.end();
@@ -315,11 +305,7 @@ TEST(test_min_greater_than){
     BST2.insert(8);
     BST2.insert(6);
     BST2.insert(9);
-    auto it_begin2 = BST2.begin();
-    it_begin2++;
-    it_begin2++;
-    it_begin2++;
-    ASSERT_EQUAL(BST2.min_greater_than(1), it_begin2);
+    ASSERT_EQUAL(*BST2.min_greater_than(1), 6);
 
     BinarySearchTree<int> BST3;
     BST3.insert(9);
