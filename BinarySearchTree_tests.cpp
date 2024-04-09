@@ -44,6 +44,8 @@ TEST(test_non_default_ctor) {
     BinarySearchTree<int> BST2(BST);
     ASSERT_EQUAL(BST.height(), 3u);
     ASSERT_EQUAL(BST.size(), 7u);
+    ASSERT_NOT_EQUAL(BST.begin(), BST2.begin());
+
 
     auto it_end = BST.end();
     ASSERT_EQUAL(BST.find(20), it_end);
@@ -315,6 +317,7 @@ TEST(test_min){
     BinarySearchTree<int> BST4;
     BST4.insert(4);
     ASSERT_EQUAL(*BST4.min_element(),4);
+    ASSERT_TRUE(BST4.check_sorting_invariant());
     ASSERT_EQUAL(BST4.min_element(),BST4.begin());
 
     BinarySearchTree<int> BST5;
@@ -352,6 +355,20 @@ TEST(test_max){
     BST4.insert(4);
     ASSERT_EQUAL(*BST4.max_element(),4);
     ASSERT_EQUAL(BST4.max_element(),BST4.begin());
+
+
+    BinarySearchTree<int> BST5;
+    BST5.insert(0);
+    BST5.insert(-10);
+    ASSERT_EQUAL(*BST5.max_element(),0);
+    ASSERT_EQUAL(*BST5.min_element(),-10);
+
+    BinarySearchTree<int> BST6;
+    BST6.insert(-20);
+    BST6.insert(-10);
+    ASSERT_EQUAL(*BST6.max_element(),-10);
+
+
 }
 
 TEST(test_min_greater_than){
@@ -377,6 +394,7 @@ TEST(test_min_greater_than){
     ASSERT_EQUAL(BST3.min_greater_than(9), it_end3);
     ASSERT_EQUAL(BST3.min_greater_than(10), it_end3);
     ASSERT_EQUAL(*BST3.min_greater_than(8), 9);
+    
 
 }
 
@@ -402,4 +420,72 @@ TEST(test_min_greater_than2){
     ASSERT_EQUAL(BST3.min_greater_than(9), it_end3);
 }
 
+
+TEST(test_strings) {
+    BinarySearchTree<string> BST;
+    BST.insert("Hello");
+    BST.insert("World");
+    BST.insert("!!");
+    ASSERT_EQUAL(*BST.min_greater_than("Hello"), "World");
+    ASSERT_EQUAL(*BST.max_element(), "World");
+    ASSERT_EQUAL(*BST.begin(), "!!");
+    ASSERT_EQUAL(BST.find("!!"), BST.begin());
+    ASSERT_EQUAL(BST.find("Hel"), BST.end());
+    ASSERT_EQUAL(*(++(BST.find("Hello"))), "World");
+    ASSERT_EQUAL(BST.height(), 2u);
+    ASSERT_EQUAL(BST.size(), 3u);
+
+    BinarySearchTree<string> BST2(BST);
+    ASSERT_EQUAL(*BST2.min_greater_than("Hello"), "World");
+    ASSERT_EQUAL(*BST2.max_element(), "World");
+    ASSERT_EQUAL(*BST2.begin(), "!!");
+    ASSERT_EQUAL(BST2.find("!!"), BST2.begin());
+    ASSERT_EQUAL(BST2.find("Hel"), BST2.end());
+    ASSERT_EQUAL(*(++(BST2.find("Hello"))), "World");
+    ASSERT_EQUAL(BST2.height(), 2u);
+    ASSERT_EQUAL(BST2.size(), 3u);
+
+
+ 
+
+}
+
+TEST(test_iterators_empty) {
+    BinarySearchTree<int> BST;
+    ASSERT_EQUAL(BST.begin(), BST.end());
+    ASSERT_TRUE(BST.check_sorting_invariant());
+}
+TEST(test_assignment2) {
+    BinarySearchTree<int> BST;
+    BST.insert(10);
+    BST.insert(5);
+    BST.insert(15);
+    
+    BinarySearchTree<int> BST2 = BST;
+    BST.insert(3);
+    BST2.insert(20);
+    
+    ASSERT_EQUAL(BST.size(), 4u);
+    ASSERT_EQUAL(BST2.size(), 4u);
+    ASSERT_TRUE(BST.find(3) != BST.end());
+    ASSERT_TRUE(BST2.find(20) != BST2.end());
+    ASSERT_TRUE(BST.find(20) == BST.end());
+    ASSERT_TRUE(BST2.find(3) == BST2.end());
+}
+
+TEST(test_edge) {
+    BinarySearchTree<int> BST;
+    BST.insert(INT_MAX);
+    BST.insert(INT_MIN);
+    BST.insert(0);
+
+    ASSERT_TRUE(BST.find(INT_MAX) != BST.end());
+    ASSERT_TRUE(BST.find(INT_MIN) != BST.end());
+    ASSERT_TRUE(BST.find(0) != BST.end());
+    ASSERT_EQUAL(BST.size(), 3u);
+    ASSERT_EQUAL(*BST.min_element(), INT_MIN);
+    ASSERT_EQUAL(*BST.max_element(), INT_MAX);
+    ASSERT_EQUAL(BST.find(INT_MIN),  BST.begin());
+
+}
 TEST_MAIN()
