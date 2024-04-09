@@ -555,27 +555,25 @@ private:
   //       'less' parameter). Based on the result, you gain some information
   //       about where the element you're looking for could be.
 
-  //I'll clean this up later
   static Node * min_greater_than_impl(Node *node, const T &val, Compare less) {
     if(!node){
       return nullptr;
     }
 
-    //if the node is greater than and the left node is also greater than
-    if (node->left && (less(val, node->datum) && less(val, node->left->datum)) ){
-      return min_greater_than_impl(node->left, val, less);
-    }
-    //equal or less, theres probably a better way to do this
-    if (node->right && (less(node->datum, val) ||  (!less(val, node->datum)&&(!less(val, node->datum))))){
-      return min_greater_than_impl(node->right, val, less);
-    }
-    //node is either greater than or less than with no right node
-    if (less(val, node->datum)){
-      return node;
-    }
-    else{
-      return nullptr;
-    }
+    if (less(val, node->datum)) {
+      //search left tree for smaller, still larger value
+      Node* leftSearch = min_greater_than_impl(node->left, val, less);
+      if (leftSearch != nullptr) {
+        return leftSearch;
+      }
+      else {
+        //returns original node if left tree had no values larger than val
+        return node;
+      }
+    } 
+  else {
+    return min_greater_than_impl(node->right, val, less);
+  }
 
 
   }

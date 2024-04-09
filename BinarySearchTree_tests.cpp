@@ -264,7 +264,6 @@ TEST(test_min){
     BST2.insert(6);
     BST2.insert(2);
     BST2.insert(3);
-    BST2.insert(6);
     BST2.insert(1);
     ASSERT_EQUAL(*BST2.min_element(),1);
 
