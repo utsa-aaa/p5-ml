@@ -75,6 +75,20 @@ TEST(test_height) {
     it_begin++;
     ASSERT_EQUAL(*it_begin, 2);
 
+    BinarySearchTree<int> BST2;
+    BST2.insert(1);
+    ASSERT_EQUAL(BST2.height(), 1u);
+    ASSERT_EQUAL(BST2.size(), 1u);
+
+    BinarySearchTree<int> BST3;
+    ASSERT_EQUAL(BST3.height(), 0u);
+    ASSERT_EQUAL(BST3.size(), 0u);
+
+    BinarySearchTree<int> BST4(BST3);
+    ASSERT_EQUAL(BST4.height(), 0u);
+    ASSERT_EQUAL(BST4.size(), 0u);
+
+
 
 }
 
@@ -102,6 +116,20 @@ TEST(test_branch_and_copy) {
 
     ASSERT_EQUAL(BST2.height(), 5u);
     ASSERT_EQUAL(BST2.size(), 5u);
+
+}
+TEST(test_copy2) {
+    BinarySearchTree<int> BST;
+    BST.insert(1);
+    auto it_begin = BST.begin();
+
+    BinarySearchTree<int> BST2;
+    BST2.insert(1);
+    auto it_begin2 = BST2.begin();
+    ASSERT_NOT_EQUAL(it_begin, it_begin2);
+    BinarySearchTree<int> &BST3 = BST;
+    BST = BST3;
+    ASSERT_EQUAL(it_begin, BST.begin());
 
 }
 
@@ -146,6 +174,14 @@ TEST(test_increment) {
     ASSERT_TRUE(BST.check_sorting_invariant());
 
 
+
+}
+TEST(test_increment2) {
+    BinarySearchTree<int> BST;
+    BST.insert(4);
+    auto it_begin = BST.begin();
+    ++it_begin;
+    ASSERT_EQUAL(it_begin, BST.end());
 
 }
 
@@ -250,6 +286,11 @@ TEST(test_find){
     BinarySearchTree<int> BST3;
     auto it_end_2 = BST3.end();
     ASSERT_EQUAL(BST3.find(5), it_end_2);
+
+    BinarySearchTree<int> BST4;
+    BST4.insert(1);
+    ASSERT_EQUAL(BST4.find(1), BST4.begin());
+
 }
 
 TEST(test_min){
@@ -270,7 +311,22 @@ TEST(test_min){
     BinarySearchTree<int> BST3;
     auto it_end = BST3.end();
     ASSERT_EQUAL(BST3.min_element(), it_end);
+
+    BinarySearchTree<int> BST4;
+    BST4.insert(4);
+    ASSERT_EQUAL(*BST4.min_element(),4);
+    ASSERT_EQUAL(BST4.min_element(),BST4.begin());
+
+    BinarySearchTree<int> BST5;
+    BST5.insert(-10);
+    ASSERT_EQUAL(*BST5.min_element(),-10);
+    BST5.insert(-20);
+    ASSERT_EQUAL(*BST5.min_element(),-20);
+    ASSERT_EQUAL(*BST5.max_element(),-10);
+
+
 }
+
 
 TEST(test_max){
     BinarySearchTree<int> BST;
@@ -291,9 +347,40 @@ TEST(test_max){
     BinarySearchTree<int> BST3;
     auto it_end = BST3.end();
     ASSERT_EQUAL(BST3.max_element(), it_end);
+
+    BinarySearchTree<int> BST4;
+    BST4.insert(4);
+    ASSERT_EQUAL(*BST4.max_element(),4);
+    ASSERT_EQUAL(BST4.max_element(),BST4.begin());
 }
 
 TEST(test_min_greater_than){
+    BinarySearchTree<int> BST;
+    auto it_end = BST.end();
+    ASSERT_EQUAL(BST.min_greater_than(65), it_end);
+
+    BinarySearchTree<int> BST2;
+    BST2.insert(7);
+    BST2.insert(1);
+    BST2.insert(8);
+    BST2.insert(6);
+    BST2.insert(9);
+    ASSERT_EQUAL(*BST2.min_greater_than(1), 6);
+    ASSERT_EQUAL(*BST2.min_greater_than(6), 7);
+
+    BinarySearchTree<int> BST3;
+    BST3.insert(9);
+    BST3.insert(6);
+    BST3.insert(4);
+    BST3.insert(8);
+    auto it_end3 = BST3.end();
+    ASSERT_EQUAL(BST3.min_greater_than(9), it_end3);
+    ASSERT_EQUAL(BST3.min_greater_than(10), it_end3);
+    ASSERT_EQUAL(*BST3.min_greater_than(8), 9);
+
+}
+
+TEST(test_min_greater_than2){
     BinarySearchTree<int> BST;
     auto it_end = BST.end();
     ASSERT_EQUAL(BST.min_greater_than(65), it_end);
@@ -314,7 +401,5 @@ TEST(test_min_greater_than){
     auto it_end3 = BST3.end();
     ASSERT_EQUAL(BST3.min_greater_than(9), it_end3);
 }
-
-
 
 TEST_MAIN()
