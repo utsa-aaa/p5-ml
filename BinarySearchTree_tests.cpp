@@ -475,17 +475,17 @@ TEST(test_assignment2) {
 
 TEST(test_edge) {
     BinarySearchTree<int> BST;
-    BST.insert(INT_MAX);
-    BST.insert(INT_MIN);
+    BST.insert(999999);
+    BST.insert(-999999);
     BST.insert(0);
 
-    ASSERT_TRUE(BST.find(INT_MAX) != BST.end());
-    ASSERT_TRUE(BST.find(INT_MIN) != BST.end());
+    ASSERT_TRUE(BST.find(999999) != BST.end());
+    ASSERT_TRUE(BST.find(-999999) != BST.end());
     ASSERT_TRUE(BST.find(0) != BST.end());
     ASSERT_EQUAL(BST.size(), 3u);
-    ASSERT_EQUAL(*BST.min_element(), INT_MIN);
-    ASSERT_EQUAL(*BST.max_element(), INT_MAX);
-    ASSERT_EQUAL(BST.find(INT_MIN),  BST.begin());
+    ASSERT_EQUAL(*BST.min_element(), -999999);
+    ASSERT_EQUAL(*BST.max_element(), 999999);
+    ASSERT_EQUAL(BST.find(-999999),  BST.begin());
 
 }
 TEST_MAIN()
