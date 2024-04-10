@@ -488,4 +488,112 @@ TEST(test_edge) {
     ASSERT_EQUAL(BST.find(-999999),  BST.begin());
 
 }
+
+
+TEST(test_double) {
+    BinarySearchTree<double> BST;
+    BST.insert(1.2);
+    BST.insert(1.21);
+    BST.insert(1.22);
+    ASSERT_EQUAL(*BST.min_greater_than(1.2), 1.21);
+    ASSERT_EQUAL(*BST.max_element(), 1.22);
+    ASSERT_EQUAL(*BST.begin(), 1.2);
+    ASSERT_EQUAL(BST.find(1.2), BST.begin());
+    ASSERT_EQUAL(BST.find(1.223), BST.end());
+    ASSERT_EQUAL(*(++(BST.find(1.21))), 1.22);
+    ASSERT_EQUAL(BST.height(), 3u);
+    ASSERT_EQUAL(BST.size(), 3u);
+
+    BinarySearchTree<double> BST2(BST);
+    ASSERT_EQUAL(*BST2.min_greater_than(1.2), 1.21);
+    ASSERT_EQUAL(*BST2.max_element(), 1.22);
+    ASSERT_EQUAL(*BST2.begin(), 1.2);
+    ASSERT_EQUAL(BST2.find(1.2), BST2.begin());
+    ASSERT_EQUAL(BST2.find(1.223), BST2.end());
+    ASSERT_EQUAL(*(++(BST2.find(1.21))), 1.22);
+    ASSERT_EQUAL(BST2.height(), 3u);
+
+}
+
+TEST(test_large) {
+    BinarySearchTree<int> BST;
+    int n = 1000; 
+    for (int i = 0; i < n; ++i) {
+        BST.insert(i);
+    }
+    ASSERT_EQUAL(BST.size(), n);
+    ASSERT_TRUE(BST.check_sorting_invariant());
+
+}
+
+TEST(test_assign) {
+  BinarySearchTree<int> BST1;
+  BST1.insert(10);
+  BinarySearchTree<int> BST2;
+  BST2 = BST1; 
+  BST2.insert(20);
+  ASSERT_EQUAL(BST1.size(), 1u);
+  ASSERT_EQUAL(BST2.size(), 2u);
+}
+TEST(test_traversals) {
+  BinarySearchTree<int> BST;
+  BST.insert(40);
+  BST.insert(20);
+  BST.insert(60);
+  BST.insert(10);
+  BST.insert(30);
+  BST.insert(50);
+  BST.insert(70);
+  ostringstream inorder, preorder;
+  BST.traverse_inorder(inorder);
+  BST.traverse_preorder(preorder);
+  ASSERT_EQUAL(inorder.str(), "10 20 30 40 50 60 70 ");
+  ASSERT_EQUAL(preorder.str(), "40 20 10 30 60 50 70 ");
+}
+
+TEST(test_traversals2) {
+  BinarySearchTree<int> BST;
+  ostringstream inorder, preorder;
+
+  BST.traverse_inorder(inorder);
+  BST.traverse_preorder(preorder);
+  ASSERT_EQUAL(inorder.str(), ""); 
+  ASSERT_EQUAL(preorder.str(), ""); 
+}
+
+TEST(test_traversals3) {
+  BinarySearchTree<int> BST;
+  ostringstream inorder, preorder;
+  BST.insert(42);
+  BST.traverse_inorder(inorder);
+  BST.traverse_preorder(preorder);
+  ASSERT_EQUAL(inorder.str(), "42 ")
+  ASSERT_EQUAL(preorder.str(), "42 ")
+}
+
+TEST(test_traversals4) {
+  BinarySearchTree<int> BST;
+  ostringstream inorder, preorder;
+  BST.insert(3);
+  BST.insert(2);
+  BST.insert(1); 
+  BST.traverse_inorder(inorder);
+  BST.traverse_preorder(preorder);
+  ASSERT_EQUAL(inorder.str(), "1 2 3 "); 
+  ASSERT_EQUAL(preorder.str(), "3 2 1 ");
+}
+
+TEST(test_traversals5) {
+  BinarySearchTree<int> BST;
+  ostringstream inorder, preorder;
+  BST.insert(1);
+  BST.insert(2);
+  BST.insert(3); 
+  BST.traverse_inorder(inorder);
+  BST.traverse_preorder(preorder);
+  ASSERT_EQUAL(inorder.str(), "1 2 3 ");
+  ASSERT_EQUAL(preorder.str(), "1 2 3 ");
+}
+
+
 TEST_MAIN()
