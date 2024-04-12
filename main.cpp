@@ -10,7 +10,7 @@
 using namespace std;
 
 class Classifier{
-    public:
+    private:
     int num_posts = 0;
     int vocab_size = 0;
     map<string, int> word_freq;
@@ -119,9 +119,9 @@ class Classifier{
             string label = line[2];
             string content = line[3];
             auto guess = classify(content);
-            cout << "correct = " << label << ", predicted = " <<
+            cout << "   correct = " << label << ", predicted = " <<
             guess.first << ", log-probability score = " << guess.second << endl;
-            cout << "content = " << content << endl << endl;
+            cout << "   content = " << content << endl << endl;
 
             posts ++;
             if (guess.first == label){
