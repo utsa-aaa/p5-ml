@@ -10,15 +10,60 @@
 using namespace std;
 
 class Classifier{
-    private:
-    int num_posts;
-    int vocab_size;
+    public:
+    int num_posts = 0;
+    int vocab_size = 0;
     map<string, int> word_freq;
     map<string, int> label_freq;
     map<std::pair<string, string>, int> c_with_w;
 
+    float log_p(string &content, const string &label){
+        set<string> words = unique_words(content);
+        double log_prior = log(static_cast<float>(label_freq[label]) /num_posts);
+        double sum = log_prior;
+        for (auto word: words){
+            //w and c in data together
+            if (c_with_w.find({label, word}) != c_with_w.end()) {
+                sum +=  log(c_with_w[{label, word}]/static_cast<float>(label_freq[label]));
+  
+            }
+            //w not in data
+            else if (word_freq.find(word) == word_freq.end()){
+                sum +=  log(1.0/static_cast<float>(num_posts));
+                
+            }
+            //both in training but not together
+            else{
+                sum +=  log(word_freq[word]/static_cast<float>(num_posts));
 
+            }
+        }
+        return sum;
+    }
 
+    set<string> unique_words(const string &str) {
+        istringstream source(str);
+        set<string> words;
+        string word;
+        while (source >> word) {
+            words.insert(word);
+        }
+        return words;
+    }
+
+    std::pair<string, float> classify(string &content){
+
+        map<float, string, std::greater<double>> classifier_map;
+        for (const auto &label : label_freq) {
+            float logProb = log_p(content, label.first);
+            if (classifier_map.find(logProb) == classifier_map.end()) { 
+                classifier_map[logProb] = label.first;
+            }
+        }
+        auto itr = classifier_map.begin();
+        return {itr->second, itr->first};
+
+    }
 
     public:
     void train(ifstream&fin){
@@ -59,18 +104,38 @@ class Classifier{
             }
 
         }
+    cout << "trained on " << num_posts << " samples " << endl << endl;;
+
+    }
+
+
+    void test(ifstream&fin){
+        cout <<  "test data:" << endl;
+        std::vector<std::string> line;
+        int performance = 0;
+        int posts = 0;
+        while (read_csv_line(fin,line, ',')) {
+            num_posts ++;
+            string label = line[2];
+            string content = line[3];
+            auto guess = classify(content);
+            cout << "correct = " << label << ", predicted = " <<
+            guess.first << ", log-probability score = " << guess.second << endl;
+            cout << "content = " << content << endl << endl;
+
+            posts ++;
+            if (guess.first == label){
+                performance++;
+            }
+
+        }
+        cout << "performance: " << performance << " / " << posts << " posts predicted correctly" << endl;
 
     }
 };
- set<string> unique_words(const string &str) {
-    istringstream source(str);
-    set<string> words;
-    string word;
-    while (source >> word) {
-        words.insert(word);
-    }
-    return words;
-    }
+
+
+
 
 
 
@@ -101,13 +166,16 @@ int main(int argc, char **argv){
     csvstream training_data(fin1);
     training_data.getheader();
     Classifier training;
-
-    
     training.train(fin1);
 
+    csvstream testing_data(fin2);
+    testing_data.getheader();
+
+    training.test(fin2);
+
+    
+
 }
-
-
 
 
 
