@@ -17,29 +17,36 @@ class Classifier{
     map<string, int> label_freq;
     map<std::pair<string, string>, int> c_with_w;
 
-    float log_p(string &content, const string &label){
-        set<string> words = unique_words(content);
-        double log_prior = log(static_cast<float>(label_freq[label]) /num_posts);
-        double sum = log_prior;
-        for (auto word: words){
-            //w and c in data together
-            if (c_with_w.find({label, word}) != c_with_w.end()) {
-                sum +=  log(c_with_w[{label, word}]/static_cast<float>(label_freq[label]));
+    float log_likehlihood(const string &word, const string &label){
+        float log_val = 0;
+        if (c_with_w.find({label, word}) != c_with_w.end()) {
+
+                log_val =  log(c_with_w[{label, word}]/static_cast<float>(label_freq[label]));
   
             }
             //w not in data
             else if (word_freq.find(word) == word_freq.end()){
-                sum +=  log(1.0/static_cast<float>(num_posts));
+                log_val =  log(1.0/static_cast<float>(num_posts));
                 
             }
             //both in training but not together
             else{
-                sum +=  log(word_freq[word]/static_cast<float>(num_posts));
+                log_val =  log(word_freq[word]/static_cast<float>(num_posts));
 
             }
+            return log_val;
+    }
+
+    float log_total(string &content, const string &label){
+        set<string> words = unique_words(content);
+        double log_prior = log(static_cast<float>(label_freq[label]) /num_posts);
+        double sum = log_prior;
+        for (auto word: words){
+            sum += log_likehlihood(word, label);
         }
         return sum;
     }
+
 
     set<string> unique_words(const string &str) {
         istringstream source(str);
@@ -55,9 +62,10 @@ class Classifier{
 
         map<float, string, std::greater<double>> classifier_map;
         for (const auto &label : label_freq) {
-            float logProb = log_p(content, label.first);
+            float logProb = log_total(content, label.first);
             if (classifier_map.find(logProb) == classifier_map.end()) { 
                 classifier_map[logProb] = label.first;
+                
             }
         }
         auto itr = classifier_map.begin();
@@ -66,12 +74,18 @@ class Classifier{
     }
 
     public:
-    void train(ifstream&fin){
+    void train(ifstream&fin, bool debug){
+        if (debug){
+            cout << "training data:" << endl;
+        }
         std::vector<std::string> line;
         while (read_csv_line(fin,line, ',')) {
             num_posts ++;
             string label = line[2];
             string content = line[3];
+            if (debug){
+                cout << "  label = " << label << ", content = " << content << endl;
+            }
 
             //label not added yet
             if (label_freq.find(label) == label_freq.end()){
@@ -104,25 +118,41 @@ class Classifier{
             }
 
         }
-    cout << "trained on " << num_posts << " samples " << endl << endl;;
+    cout << "trained on " << num_posts << " examples" << endl;
+    if (debug){
+        cout << "vocabulary size = " << vocab_size << endl;
+    }
+    cout << endl;
+
+    if (debug){
+        cout << "classes:" << endl;
+        for (auto &label: label_freq){
+            cout << "  " << label.first << ", " << label.second << " examples, log-prior = "
+             << log(static_cast<float>(label.second) /num_posts) << endl;
+        }
+        cout << "classifier parameters:" << endl;
+        for (auto &word_pair: c_with_w){
+            cout << "  " << word_pair.first.first << ":" << word_pair.first.second << ", count = " << word_pair.second <<
+            ", log-likelihood = " << log_likehlihood(word_pair.first.second, word_pair.first.first) << endl;
+            
+        }
+    cout << endl;
 
     }
 
-
+ }
     void test(ifstream&fin){
         cout <<  "test data:" << endl;
         std::vector<std::string> line;
         int performance = 0;
         int posts = 0;
         while (read_csv_line(fin,line, ',')) {
-            num_posts ++;
             string label = line[2];
             string content = line[3];
             auto guess = classify(content);
-            cout << "   correct = " << label << ", predicted = " <<
+            cout << "  correct = " << label << ", predicted = " <<
             guess.first << ", log-probability score = " << guess.second << endl;
-            cout << "   content = " << content << endl << endl;
-
+            cout << "  content = " << content << endl << endl;
             posts ++;
             if (guess.first == label){
                 performance++;
@@ -141,6 +171,7 @@ class Classifier{
 
 
 int main(int argc, char **argv){
+    cout.precision(3);
     if(argc<3 || argc>4){
         cout << "Usage: main.exe TRAIN_FILE TEST_FILE [--debug]" << endl;
         return 1;
@@ -166,7 +197,12 @@ int main(int argc, char **argv){
     csvstream training_data(fin1);
     training_data.getheader();
     Classifier training;
-    training.train(fin1);
+    if (argc == 4){
+        training.train(fin1, true);
+    }
+    else{
+        training.train(fin1, false);
+    }
 
     csvstream testing_data(fin2);
     testing_data.getheader();
