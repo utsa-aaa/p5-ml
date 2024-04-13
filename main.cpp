@@ -73,30 +73,28 @@ class Classifier{
     }
 
     public:
-    void train(ifstream&fin, bool debug){
+    void train(csvstream&data, bool debug){
         if (debug){
             cout << "training data:" << endl;
         }
-        std::vector<std::string> line;
         set<string> unique;
-        while (read_csv_line(fin,line, ',')) {
+        std::map<std::string, std::string> row;
+        while (data >> row) {
             num_posts ++;
-            string label = line[2];
-            string content = line[3];
             if (debug){
-                cout << "  label = " << label << ", content = " << content << endl;
+                cout << "  label = " << row["tag"] << ", content = " << row["content"] << endl;
             }
 
             //label not added yet
-            if (label_freq.find(label) == label_freq.end()){
-                label_freq[label] = 1;
+            if (label_freq.find(row["tag"]) == label_freq.end()){
+                label_freq[row["tag"]] = 1;
             }
             else{
-                label_freq[label]++;
+                label_freq[row["tag"]]++;
             }
 
             unique.clear();
-            unique = unique_words(content);
+            unique = unique_words(row["content"]);
             for (auto word: unique){
                 if (word_freq.find(word) == word_freq.end()){
                     //word not in classifier yet
@@ -107,7 +105,7 @@ class Classifier{
                     word_freq[word]++;
                 }
                 //add to c_with_w
-                std::pair<string, string> label_word_pair = make_pair(label, word);
+                std::pair<string, string> label_word_pair = make_pair(row["tag"], word);
                 if (c_with_w.find(label_word_pair) == c_with_w.end()){
                     c_with_w[label_word_pair] = 1;
                 }
@@ -141,20 +139,18 @@ class Classifier{
     }
 
  }
-    void test(ifstream&fin){
+    void test(csvstream &data){
         cout <<  "test data:" << endl;
-        std::vector<std::string> line;
         int performance = 0;
         int posts = 0;
-        while (read_csv_line(fin,line, ',')) {
-            string label = line[2];
-            string content = line[3];
-            auto guess = classify(content);
-            cout << "  correct = " << label << ", predicted = " <<
+        std::map<std::string, std::string> row;
+        while (data >> row) {
+            auto guess = classify(row["content"]);
+            cout << "  correct = " << row["tag"] << ", predicted = " <<
             guess.first << ", log-probability score = " << guess.second << endl;
-            cout << "  content = " << content << endl << endl;
+            cout << "  content = " << row["content"] << endl << endl;
             posts ++;
-            if (guess.first == label){
+            if (guess.first == row["tag"]){
                 performance++;
             }
 
@@ -198,16 +194,16 @@ int main(int argc, char **argv){
     training_data.getheader();
     Classifier training;
     if (argc == 4){
-        training.train(fin1, true);
+        training.train(training_data, true);
     }
     else{
-        training.train(fin1, false);
+        training.train(training_data, false);
     }
 
     csvstream testing_data(fin2);
     testing_data.getheader();
 
-    training.test(fin2);
+    training.test(testing_data);
 
     
 
