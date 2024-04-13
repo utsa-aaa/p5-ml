@@ -15,16 +15,18 @@ class Classifier{
     int vocab_size = 0;
     map<string, int> word_freq;
     map<string, int> label_freq;
+    //stores occurences of each word with each label
     map<std::pair<string, string>, int> c_with_w;
 
     float log_likehlihood(const string &word, const string &label){
         float log_val = 0;
-        if (c_with_w.find({label, word}) != c_with_w.end()) {
 
-                log_val =  log(c_with_w[{label, word}]/static_cast<float>(label_freq[label]));
+        if (c_with_w.find({label, word}) != c_with_w.end()) {
+            //if label and word found together in training
+            log_val =  log(c_with_w[{label, word}]/static_cast<float>(label_freq[label]));
   
             }
-            //w not in data
+            //word not in data
             else if (word_freq.find(word) == word_freq.end()){
                 log_val =  log(1.0/static_cast<float>(num_posts));
                 
@@ -39,6 +41,7 @@ class Classifier{
 
     float log_total(string &content, const string &label){
         set<string> words = unique_words(content);
+
         double log_prior = log(static_cast<float>(label_freq[label]) /num_posts);
         double sum = log_prior;
         for (auto word: words){
@@ -57,16 +60,21 @@ class Classifier{
         }
         return words;
     }
+    //declare map to enable re-use, storing log probability for each string in content
     map<float, string, std::greater<double>> classifier_map;
+
     std::pair<string, float> classify(string &content){
         classifier_map.clear();
+
         for (const auto &label : label_freq) {
             float logProb = log_total(content, label.first);
+            //if theres a tie, it takes the first one, which is alphabetically first
             if (classifier_map.find(logProb) == classifier_map.end()) { 
                 classifier_map[logProb] = label.first;
                 
             }
         }
+        //largest element is first due to map sorting
         auto itr = classifier_map.begin();
         return {itr->second, itr->first};
 
@@ -77,6 +85,7 @@ class Classifier{
         if (debug){
             cout << "training data:" << endl;
         }
+        //declare set and map for reuse, storing unique words and content of each row
         set<string> unique;
         std::map<std::string, std::string> row;
         while (data >> row) {
@@ -94,7 +103,9 @@ class Classifier{
             }
 
             unique.clear();
+            //set of unique words for the row
             unique = unique_words(row["content"]);
+            //add to frequency for each unique word in row
             for (auto word: unique){
                 if (word_freq.find(word) == word_freq.end()){
                     //word not in classifier yet
@@ -143,8 +154,10 @@ class Classifier{
         cout <<  "test data:" << endl;
         int performance = 0;
         int posts = 0;
+        //map will store label and contents of each row
         std::map<std::string, std::string> row;
         while (data >> row) {
+            // guess stores classification and lob probability of content
             auto guess = classify(row["content"]);
             cout << "  correct = " << row["tag"] << ", predicted = " <<
             guess.first << ", log-probability score = " << guess.second << endl;
@@ -191,7 +204,6 @@ int main(int argc, char **argv){
     }
 
     csvstream training_data(fin1);
-    training_data.getheader();
     Classifier training;
     if (argc == 4){
         training.train(training_data, true);
@@ -201,8 +213,6 @@ int main(int argc, char **argv){
     }
 
     csvstream testing_data(fin2);
-    testing_data.getheader();
-
     training.test(testing_data);
 
     
