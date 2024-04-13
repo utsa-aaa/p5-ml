@@ -57,10 +57,9 @@ class Classifier{
         }
         return words;
     }
-
+    map<float, string, std::greater<double>> classifier_map;
     std::pair<string, float> classify(string &content){
-
-        map<float, string, std::greater<double>> classifier_map;
+        classifier_map.clear();
         for (const auto &label : label_freq) {
             float logProb = log_total(content, label.first);
             if (classifier_map.find(logProb) == classifier_map.end()) { 
@@ -79,6 +78,7 @@ class Classifier{
             cout << "training data:" << endl;
         }
         std::vector<std::string> line;
+        set<string> unique;
         while (read_csv_line(fin,line, ',')) {
             num_posts ++;
             string label = line[2];
@@ -95,8 +95,8 @@ class Classifier{
                 label_freq[label]++;
             }
 
-
-            set<string> unique = unique_words(content);
+            unique.clear();
+            unique = unique_words(content);
             for (auto word: unique){
                 if (word_freq.find(word) == word_freq.end()){
                     //word not in classifier yet
