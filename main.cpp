@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include "BinarySearchTree.hpp"
 #include "csvstream.hpp"
 #include <map>
 #include <set>
@@ -91,7 +90,8 @@ class Classifier{
         while (data >> row) {
             num_posts ++;
             if (debug){
-                cout << "  label = " << row["tag"] << ", content = " << row["content"] << endl;
+                cout << "  label = " << row["tag"] << ", content = "
+                 << row["content"] << endl;
             }
 
             //label not added yet
@@ -136,13 +136,16 @@ class Classifier{
     if (debug){
         cout << "classes:" << endl;
         for (auto &label: label_freq){
-            cout << "  " << label.first << ", " << label.second << " examples, log-prior = "
+            cout << "  " << label.first << ", " <<
+             label.second << " examples, log-prior = "
              << log(static_cast<float>(label.second) /num_posts) << endl;
         }
         cout << "classifier parameters:" << endl;
         for (auto &word_pair: c_with_w){
-            cout << "  " << word_pair.first.first << ":" << word_pair.first.second << ", count = " << word_pair.second <<
-            ", log-likelihood = " << log_likehlihood(word_pair.first.second, word_pair.first.first) << endl;
+            cout << "  " << word_pair.first.first << ":" <<
+             word_pair.first.second << ", count = " << word_pair.second <<
+            ", log-likelihood = " << log_likehlihood(word_pair.first.second,
+             word_pair.first.first) << endl;
             
         }
     cout << endl;
@@ -168,7 +171,8 @@ class Classifier{
             }
 
         }
-        cout << "performance: " << performance << " / " << posts << " posts predicted correctly" << endl;
+        cout << "performance: " << performance << " / " <<
+         posts << " posts predicted correctly" << endl;
 
     }
 };

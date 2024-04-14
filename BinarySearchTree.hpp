@@ -503,7 +503,8 @@ private:
     if(node->left && less(node->datum,node->left->datum)){
       return false;
     }
-  return check_sorting_invariant_impl(node->right, less) && check_sorting_invariant_impl(node->left, less);
+  return check_sorting_invariant_impl(node->right, less)
+   && check_sorting_invariant_impl(node->left, less);
 
     
 
