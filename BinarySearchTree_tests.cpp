@@ -583,17 +583,35 @@ TEST(test_traversals4) {
   ASSERT_EQUAL(preorder.str(), "3 2 1 ");
 }
 
+
 TEST(test_traversals5) {
-  BinarySearchTree<int> BST;
-  ostringstream inorder, preorder;
-  BST.insert(1);
-  BST.insert(2);
-  BST.insert(3); 
-  BST.traverse_inorder(inorder);
-  BST.traverse_preorder(preorder);
-  ASSERT_EQUAL(inorder.str(), "1 2 3 ");
-  ASSERT_EQUAL(preorder.str(), "1 2 3 ");
+ BinarySearchTree<int> BST;
+ ostringstream inorder, preorder;
+ BST.insert(1);
+ BST.insert(2);
+ BST.insert(3); 
+ BST.traverse_inorder(inorder);
+ BST.traverse_preorder(preorder);
+ ASSERT_EQUAL(inorder.str(), "1 2 3 ");
+ ASSERT_EQUAL(preorder.str(), "1 2 3 ");
+ auto begin = BST.begin();
+ *begin = 0;
+ ASSERT_TRUE(BST.check_sorting_invariant());
+ *begin = 100;
+ ASSERT_FALSE(BST.check_sorting_invariant());
 }
 
+TEST(test_height2) {
+ BinarySearchTree<int> BST;
+ BST.insert(-8);
+ BST.insert(-1);
+ BST.insert(-20);
+ BST.insert(10);
+ ASSERT_TRUE(BST.check_sorting_invariant());
+ ASSERT_TRUE(BST.height() == 3);
+ auto begin = BST.begin();
+ *begin = 100;
+ ASSERT_FALSE(BST.check_sorting_invariant());
+}
 
 TEST_MAIN()
